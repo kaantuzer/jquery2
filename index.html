@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Listesi</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #postList { list-style: none; padding: 0; }
+        .post { padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; background: #efefef; }
+        #loading { display: none; text-align: center; padding: 10px; }
+        .post:hover{
+            background-color: #ddd;
+            transform: scale(1.05);
+        }
+        .changecolor{
+            width: 140px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px;
+        }
+        .changecolor:hover{
+            opacity: 0.8;
+            cursor: pointer;
+        }
+        .post{
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        /*Media Query*/
+        @media (max-width: 600px) {
+        .changecolor {
+            font-size: 18px; 
+            padding: 10px; 
+            width: 100%; 
+        }
+
+        .post {
+            font-size: 14px; 
+        }
+
+    
+}
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Post List</h1>
+    <button type="button" class="changecolor">Change Color</button>
+    <ul id="postList"></ul>
+    <div id="loading">Yükleniyor...</div>
+
+    <script>
+        let start = 0;
+        const limit = 5;
+        const postList = $("#postList");
+        const loading = $("#loading");
+
+        function fetchPosts() {
+            loading.show();
+            $.get(`https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${limit}`)
+                .done(function(posts) {
+                    posts.forEach(post => {
+                        postList.append(`<li class='post'><strong>${post.title}</strong><p>${post.body}</p></li>`);
+                    });
+                    start += limit;
+                })
+                //optional
+                .fail(function() {
+                    alert("Veri yüklenirken hata oluştu!");
+                })
+                //optional
+                .always(function() {
+                    loading.hide();
+                });
+        }
+
+        $(document).ready(function() {
+            fetchPosts();
+
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                    fetchPosts();
+                }
+            });
+
+            $(".changecolor").click(function () {
+                if ($("body").hasClass("dark-mode")) {
+                    
+                    $(".post").css({
+                        "background-color": "",
+                        "color": ""
+                    });
+
+                    $("body").css("background-color", "");
+                    $("h1").css("color", "");
+                    $(".changecolor").css("background-color", "black");
+                    $(".changecolor").css("color", "white");
+
+                    $("body").removeClass("dark-mode"); 
+                } else {
+                    
+                    $(".post").css({
+                        "background-color": "black",
+                        "color": "white"
+                    });
+
+                    $("body").css("background-color", "black");
+                    $("h1").css("color", "white");
+                    $(".changecolor").css("background-color", "#efefef");
+                    $(".changecolor").css("color", "black");
+
+                    $("body").addClass("dark-mode"); 
+                }
+});
+
+
+            
+        });
+    </script>
+</body>
+</html>
+
